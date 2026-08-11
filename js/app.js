@@ -20,6 +20,7 @@
     요소('바닥안내').textContent = CONFIG.FOOTER_NOTICE;
 
     연결하기();
+    Docs.초기화();
 
     DB.open().then(function (아이디비성공) {
       if (!아이디비성공) {
@@ -53,6 +54,7 @@
         return;
       }
       UI.화면보이기(탭.dataset.화면);
+      if (탭.dataset.화면 === '자료') Docs.자료목록그리기();
     });
 
     // 맨 위 [키 설정] 버튼
