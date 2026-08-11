@@ -123,9 +123,33 @@
          화면 2 : 질문하기 (채팅)  — ③단계에서 제작
          ------------------------------------------------------------------ -->
     <section class="화면 숨김" id="화면-채팅">
-      <h2 class="화면제목">질문하기</h2>
-      <p class="화면설명">사내 규정에 있는 내용만 근거로 답합니다.</p>
-      <div class="공사중">이 화면은 다음 단계에서 만듭니다. (③ 채팅)</div>
+      <div class="채팅-머리">
+        <div>
+          <h2 class="화면제목">질문하기</h2>
+          <p class="화면설명">사내 규정에 있는 내용만 근거로 답합니다.</p>
+        </div>
+        <button type="button" class="버튼 보조 작게" id="대화지우기버튼">대화 지우기</button>
+      </div>
+
+      <div class="알림 주의 숨김" id="자료없음안내">
+        아직 등록된 규정 자료가 없습니다. 자료가 있어야 정확한 답변을 받을 수 있습니다.
+        <button type="button" class="버튼 주 작게" id="자료등록이동버튼" style="margin-top:8px;">
+          규정 자료 등록하러 가기 →
+        </button>
+      </div>
+
+      <div class="자주묻는질문" id="자주묻는질문"></div>
+
+      <div class="대화상자" id="대화상자"></div>
+
+      <div class="채팅입력바">
+        <form class="채팅입력줄" id="채팅입력폼">
+          <label class="읽기전용" for="질문입력">질문 입력</label>
+          <textarea class="입력칸 질문입력" id="질문입력" rows="1"
+                    placeholder="궁금한 점을 물어보세요 (엔터로 전송)"></textarea>
+          <button type="submit" class="버튼 주" id="전송버튼">전송</button>
+        </form>
+      </div>
     </section>
 
     <!-- ------------------------------------------------------------------
@@ -164,6 +188,7 @@
       <div class="카드">
         <div class="자료목록-머리">
           <span id="자료목록-요약">등록된 자료가 없습니다</span>
+          <button type="button" class="버튼 주 작게 숨김" id="질문하러가기버튼">질문하러 가기 →</button>
         </div>
         <div id="자료목록"></div>
         <p class="자료목록-빈칸 숨김" id="자료목록-빈칸">
@@ -202,6 +227,8 @@
   <script src="js/ui.js"></script>
   <script src="js/file-extract.js"></script>
   <script src="js/docs.js"></script>
+  <script src="js/gemini.js"></script>
+  <script src="js/chat.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

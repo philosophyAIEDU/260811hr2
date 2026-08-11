@@ -59,6 +59,11 @@ var Docs = (function () {
       UI.화면보이기('마법사');
     });
 
+    요소('질문하러가기버튼').addEventListener('click', function () {
+      UI.화면보이기('채팅');
+      if (window.Chat) Chat.화면진입시();
+    });
+
     요소('샘플불러오기버튼').addEventListener('click', 샘플불러오기);
     요소('규정집내보내기버튼').addEventListener('click', 규정집내보내기);
 
@@ -149,13 +154,17 @@ var Docs = (function () {
       var 빈칸 = 요소('자료목록-빈칸');
       var 요약 = 요소('자료목록-요약');
 
+      var 이동버튼 = 요소('질문하러가기버튼');
+
       if (자료들.length === 0) {
         목록상자.innerHTML = '';
         빈칸.classList.remove('숨김');
         요약.textContent = '등록된 자료가 없습니다';
+        이동버튼.classList.add('숨김');
         return;
       }
       빈칸.classList.add('숨김');
+      이동버튼.classList.remove('숨김');
 
       // 최근 등록한 것이 위로 오도록
       var 정렬된것 = 자료들.slice().sort(function (a, b) { return b.id.localeCompare(a.id); });
