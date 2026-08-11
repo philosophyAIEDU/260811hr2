@@ -21,8 +21,16 @@ var Gemini = (function () {
       systemInstruction: { parts: [{ text: 옵션.systemPrompt }] },
       contents: [
         { role: 'user', parts: [{ text: 옵션.question }] }
-      ]
+      ],
       // ★ temperature / topP / topK 는 넣지 않습니다 (Gemini 3.x 계열 사용 중단값)
+      generationConfig: {
+        // Gemini 3.x 계열은 답하기 전에 속으로 "생각"하는 데 출력 토큰을 함께 씁니다.
+        // 이 토큰 예산이 다 차버리면 화면에 보일 글자가 하나도 안 나오고 끝나버릴 수 있어서,
+        // ① 생각하는 양을 최소로 줄이고(단순 규정 검색·요약 작업이라 깊은 추론이 필요 없음)
+        // ② 출력 토큰 한도를 넉넉하게 잡아 둡니다.
+        thinkingConfig: { thinkingLevel: 'low' },
+        maxOutputTokens: 8192
+      }
     };
 
     var 컨트롤러 = new AbortController();
@@ -111,14 +119,18 @@ var Gemini = (function () {
     return 결과;
   }
 
-  /* 글자가 하나도 안 왔을 때, 왜 막혔는지 짐작할 단서를 찾는다. */
+  /* 글자가 하나도 안 왔을 때, 왜 막혔는지 짐작할 단서를 찾는다.
+     ※ MAX_TOKENS 는 답이 어느 정도 나온 뒤 잘린 경우에는 문제가 아니지만,
+       (누적 글자가 하나도 없는 상태에서) 이 사유로 끝났다면 "생각하는 데 토큰을
+       다 써버려 답을 하나도 못 냄"인 경우이므로 정상 종료로 보지 않는다. */
   function 중단이유찾기(응답조각) {
     if (응답조각 && 응답조각.promptFeedback && 응답조각.promptFeedback.blockReason) return 'BLOCKED';
 
     var 후보 = 응답조각 && 응답조각.candidates && 응답조각.candidates[0];
     if (!후보 || !후보.finishReason) return null;
-    if (후보.finishReason === 'STOP' || 후보.finishReason === 'MAX_TOKENS') return null;
+    if (후보.finishReason === 'STOP') return null;
     if (후보.finishReason === 'SAFETY' || 후보.finishReason === 'RECITATION') return 후보.finishReason;
+    if (후보.finishReason === 'MAX_TOKENS') return 'MAX_TOKENS';
     return '기타';
   }
 
