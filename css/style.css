@@ -1,0 +1,57 @@
+/* =========================================================================
+   디자인 기준값 (style.css)
+   -------------------------------------------------------------------------
+   1단계에서는 색·글꼴·여백 같은 "기준값"만 정해 둡니다.
+   실제 화면 모양은 2단계부터 이 기준값을 가져다 씁니다.
+   ========================================================================= */
+
+:root {
+  /* ---- 색 ---- */
+  --brand:         #6C2BD9;   /* 기본 보라 (버튼, 강조) */
+  --brand-dark:    #4C1D95;   /* 진한 보라 (눌렀을 때) */
+  --brand-light:   #F3EEFF;   /* 아주 연한 보라 (선택된 배경) */
+  --accent:        #E5177B;   /* 분홍 (현재 위치 표시) */
+  --navy:          #1B1735;   /* 짙은 남보라 (상단 띠, 왼쪽 메뉴) */
+
+  --text:          #1A1A1A;   /* 본문 글자 */
+  --text-sub:      #6B7280;   /* 흐린 글자 */
+  --line:          #E5E7EB;   /* 선 */
+  --bg:            #FFFFFF;   /* 바탕 */
+  --bg-soft:       #F7F7FA;   /* 옅은 바탕 */
+
+  --ok:            #067647;   /* 성공 */
+  --warn:          #B54708;   /* 주의 */
+  --danger:        #B42318;   /* 위험·삭제 */
+
+  /* ---- 크기 ---- */
+  --radius:        10px;
+  --radius-lg:     16px;
+  --gap:           16px;
+  --max-width:     1080px;
+
+  --shadow:        0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .06);
+  --shadow-lg:     0 8px 24px rgba(16, 24, 40, .12);
+}
+
+/* ---- 기본값 정리 ---- */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕",
+               system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg-soft);
+  -webkit-text-size-adjust: 100%;   /* 휴대폰에서 글자가 제멋대로 커지지 않게 */
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}

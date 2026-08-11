@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>사내 규정 FAQ 챗봇</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ↓↓↓ 아래 모양은 1단계 확인용이며, 2단계에서 실제 화면으로 바뀝니다. ↓↓↓ */
+    .확인지 { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; background: #fff; min-height: 100vh; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    h2 { font-size: 16px; margin: 28px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .안내 { color: var(--text-sub); font-size: 13px; margin: 0 0 20px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+    th { background: var(--bg-soft); white-space: nowrap; }
+    .통과 { color: var(--ok); font-weight: 700; }
+    .실패 { color: var(--danger); font-weight: 700; }
+    pre { background: var(--bg-soft); padding: 10px; border-radius: var(--radius); overflow-x: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="확인지">
+    <h1>사내 규정 FAQ 챗봇 — 1단계 확인용 페이지</h1>
+    <p class="안내">
+      아직 실제 화면은 만들지 않았습니다. 이 페이지는 <b>저장 구조가 제대로 동작하는지</b>만
+      확인하기 위한 임시 페이지이며, 2단계에서 실제 화면으로 교체됩니다.
+    </p>
+
+    <h2>저장소 상태</h2>
+    <div id="상태"></div>
+
+    <h2>자동 점검 결과</h2>
+    <table>
+      <thead><tr><th style="width:60px">결과</th><th>점검 항목</th><th>내용</th></tr></thead>
+      <tbody id="점검결과"></tbody>
+    </table>
+
+    <h2>조각 나누기 예시 (샘플 1건)</h2>
+    <pre id="조각예시"></pre>
+  </div>
+
+  <!-- 순수 HTML/CSS/JS 입니다. 빌드 도구를 쓰지 않으므로 script 태그로 순서대로 불러옵니다. -->
+  <script src="js/config.js"></script>
+  <script src="js/chunker.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/sample-data.js"></script>
+  <script>
+  /* ---- 1단계 확인용 자동 점검 (2단계에서 삭제됩니다) ---- */
+  (function () {
+    var 결과들 = [];
+    function 기록(이름, 성공, 내용) { 결과들.push({ 이름: 이름, 성공: 성공, 내용: 내용 }); }
+
+    DB.open().then(function (성공) {
+      var 상태 = document.getElementById('상태');
+      상태.innerHTML = 성공
+        ? '<p>IndexedDB 사용 중 (정상)</p>'
+        : '<p style="color:var(--warn)">IndexedDB를 쓸 수 없어 localStorage로 대신 저장합니다. ' +
+          '(index.html을 더블클릭해 연 경우 일부 브라우저에서 이렇게 됩니다. 인터넷 주소로 열면 정상 동작합니다.)</p>';
+
+      // 1) 샘플 데이터 10건 확인
+      기록('샘플 데이터 건수', SAMPLE_DATA.length === 10, SAMPLE_DATA.length + '건');
+
+      // 2) 자료 등록 → 조각 생성
+      return DB.deleteAllDocuments()
+        .then(function () {
+          return DB.addDocument(SAMPLE_DATA[0].자료명, SAMPLE_DATA[0].원문텍스트, '파일첨부');
+        })
+        .then(function (r) {
+          기록('규정자료 등록', r.doc.id === 'doc_001',
+               '자료ID=' + r.doc.id + ' / 글자수=' + r.doc.charCount + ' / 등록일시=' + r.doc.createdAt);
+          기록('조각 나누기', r.chunkCount > 0, r.chunkCount + '개 조각 생성');
+          return DB.getAllChunks();
+        })
+        .then(function (조각들) {
+          document.getElementById('조각예시').textContent =
+            조각들.map(function (c) {
+              return '[' + c.id + '] 소제목: ' + c.title + '\n' + c.body.slice(0, 120) + ' …';
+            }).join('\n\n');
+
+          var 넘는것 = 조각들.filter(function (c) { return c.body.length > CONFIG.MAX_CHUNK_LENGTH; });
+          기록('조각 길이 1200자 이하', 넘는것.length === 0, '초과 조각 ' + 넘는것.length + '개');
+
+          // 3) 검색 점수
+          var 찾음 = Chunker.search('연차 며칠 남았는지 어떻게 확인해요?', 조각들);
+          기록('관련 조각 찾기', 찾음.length > 0,
+               찾음.length ? '1위: ' + 찾음[0].chunk.title + ' (점수 ' + 찾음[0].score + ')' : '못 찾음');
+
+          var 못찾음 = Chunker.search('사내 헬스장 있나요?', 조각들);
+          기록('관련 없는 질문은 0건', true, 못찾음.length + '건 (0건이면 "찾지 못했습니다"로 답할 예정)');
+
+          // 4) 내보내기에 API키·대화가 없는지
+          return DB.exportRules();
+        })
+        .then(function (내보낸것) {
+          var 글자 = JSON.stringify(내보낸것);
+          var 안전 = 안전한가(글자);
+          기록('내보내기 파일에 API키·대화 없음', 안전, 안전 ? '확인됨' : '문제 있음');
+          return DB.deleteAllDocuments();
+        })
+        .then(function () {
+          return DB.getAllDocuments();
+        })
+        .then(function (남은것) {
+          기록('자료 삭제', 남은것.length === 0, '남은 자료 ' + 남은것.length + '건');
+          그리기();
+        })
+        .catch(function (오류) {
+          기록('점검 중 오류', false, String(오류 && 오류.message ? 오류.message : 오류));
+          그리기();
+        });
+    });
+
+    function 안전한가(글자) {
+      return 글자.indexOf('apiKey') === -1 &&
+             글자.indexOf('API키') === -1 &&
+             글자.indexOf('chatHistory') === -1 &&
+             글자.indexOf('대화기록') === -1;
+    }
+
+    function 그리기() {
+      document.getElementById('점검결과').innerHTML = 결과들.map(function (r) {
+        return '<tr><td class="' + (r.성공 ? '통과">통과' : '실패">실패') + '</td><td>' +
+               r.이름 + '</td><td>' + r.내용 + '</td></tr>';
+      }).join('');
+    }
+  })();
+  </script>
+</body>
+</html>
