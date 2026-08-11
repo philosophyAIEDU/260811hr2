@@ -67,19 +67,7 @@ var Docs = (function () {
 
     요소('샘플불러오기버튼').addEventListener('click', 샘플불러오기);
 
-    요소('샘플미리보기버튼').addEventListener('click', 미리보기열기);
-    요소('샘플미리보기-닫기1').addEventListener('click', 미리보기닫기);
-    요소('샘플미리보기-닫기2').addEventListener('click', 미리보기닫기);
-    요소('샘플미리보기-배경').addEventListener('click', function (e) {
-      if (e.target === e.currentTarget) 미리보기닫기();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && !요소('샘플미리보기-배경').classList.contains('숨김')) 미리보기닫기();
-    });
-    요소('샘플미리보기-등록버튼').addEventListener('click', function () {
-      미리보기닫기();
-      샘플불러오기();
-    });
+    요소('샘플미리보기버튼').addEventListener('click', 샘플미리보기열기);
     요소('규정집내보내기버튼').addEventListener('click', 규정집내보내기);
 
     요소('규정집불러오기버튼').addEventListener('click', function () {
@@ -94,9 +82,11 @@ var Docs = (function () {
     // 자료 목록 안의 삭제 버튼들 (목록을 새로 그릴 때마다 버튼이 새로 생기므로,
     // 바깥 상자에 한 번만 붙여 두고 클릭된 버튼을 찾아 처리한다)
     요소('자료목록').addEventListener('click', function (e) {
+      var 원문버튼 = e.target.closest('.자료항목-원문');
+      if (원문버튼) { 원문보기(원문버튼.dataset.id); return; }
+
       var 삭제버튼 = e.target.closest('.자료항목-삭제');
-      if (!삭제버튼) return;
-      자료삭제(삭제버튼.dataset.id, 삭제버튼.dataset.name);
+      if (삭제버튼) 자료삭제(삭제버튼.dataset.id, 삭제버튼.dataset.name);
     });
   }
 
@@ -211,10 +201,14 @@ var Docs = (function () {
             UI.숫자표기(자료.charCount) + '자 · ' + UI.안전한글자(자료.createdAt) + ' 등록' +
           '</div>' +
         '</div>' +
-        '<button type="button" class="버튼 위험 작게 자료항목-삭제" ' +
-                'data-id="' + UI.안전한글자(자료.id) + '" data-name="' + UI.안전한글자(자료.name) + '">' +
-          '삭제' +
-        '</button>' +
+        '<div class="자료항목-버튼들">' +
+          '<button type="button" class="버튼 보조 작게 자료항목-원문" ' +
+                  'data-id="' + UI.안전한글자(자료.id) + '">원문 보기</button>' +
+          '<button type="button" class="버튼 위험 작게 자료항목-삭제" ' +
+                  'data-id="' + UI.안전한글자(자료.id) + '" data-name="' + UI.안전한글자(자료.name) + '">' +
+            '삭제' +
+          '</button>' +
+        '</div>' +
       '</div>'
     );
   }
@@ -239,23 +233,31 @@ var Docs = (function () {
        그대로 화면에 그려서 보여준다. (index.html의 UTF-8 설정을 그대로 따르므로
        어떤 환경에서도 글자가 깨지지 않는다)
      ===================================================================== */
-  function 미리보기열기() {
-    요소('샘플미리보기-본문').innerHTML = SAMPLE_DATA.map(function (자료) {
-      return (
-        '<div class="미리보기-자료">' +
-          '<p class="미리보기-자료-이름">📄 ' + UI.안전한글자(자료.자료명) + '</p>' +
-          '<p class="미리보기-자료-글">' + UI.안전한글자(자료.원문텍스트) + '</p>' +
-        '</div>'
-      );
-    }).join('');
-
-    요소('샘플미리보기-배경').classList.remove('숨김');
-    document.body.style.overflow = 'hidden';
+  function 샘플미리보기열기() {
+    UI.문서창열기({
+      제목: '샘플 규정 미리보기 · 가나다주식회사 (10건)',
+      설명: '아래 내용이 그대로 규정 자료로 등록됩니다.',
+      항목들: SAMPLE_DATA.map(function (자료) {
+        return { 이름: 자료.자료명, 글: 자료.원문텍스트 };
+      }),
+      주버튼: { 글: '이 내용 그대로 등록하기', 실행: 샘플불러오기 }
+    });
   }
 
-  function 미리보기닫기() {
-    요소('샘플미리보기-배경').classList.add('숨김');
-    document.body.style.overflow = '';
+  /* 등록된 자료 한 건의 원문을 그대로 보여준다 (AI 답변 교차 확인용). */
+  function 원문보기(docId) {
+    DB.getDocument(docId).then(function (자료) {
+      if (!자료) {
+        UI.쪽지('자료를 찾지 못했습니다.', '오류');
+        return;
+      }
+      UI.문서창열기({
+        제목: 자료.name,
+        설명: UI.숫자표기(자료.charCount) + '자 · ' + 자료.createdAt + ' 등록 · ' +
+              (자료.source === '마법사생성' ? '마법사로 만든 규정' : '첨부한 파일'),
+        항목들: [{ 이름: 자료.name, 글: 자료.text }]
+      });
+    });
   }
 
   /* =====================================================================

@@ -20,6 +20,7 @@
     요소('바닥안내').textContent = CONFIG.FOOTER_NOTICE;
 
     연결하기();
+    UI.문서창연결하기();
     Docs.초기화();
     Chat.초기화();
     Wizard.초기화();
