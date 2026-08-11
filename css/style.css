@@ -330,6 +330,53 @@ a { color: var(--brand); }
 }
 
 /* =========================================================================
+   3-1. 팝업창 (모달) — 샘플 규정 미리보기 등에 사용
+   ========================================================================= */
+
+.모달-배경 {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(27, 23, 53, .55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.모달 {
+  width: 100%; max-width: 680px; max-height: min(80vh, 720px);
+  background: #fff; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.모달-머리 {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 16px 18px; border-bottom: 1px solid var(--line); flex: 0 0 auto;
+}
+.모달-머리 h3 { margin: 0; font-size: 15.5px; font-weight: 800; }
+.모달-닫기 {
+  flex: 0 0 auto; width: 30px; height: 30px; border: 0; border-radius: 8px;
+  background: var(--bg-soft); color: var(--text-sub); font-size: 15px; cursor: pointer;
+}
+.모달-닫기:hover { background: #EDEBF5; color: var(--text); }
+
+.모달-본문 { flex: 1 1 auto; overflow-y: auto; padding: 18px; }
+.모달-바닥줄 {
+  flex: 0 0 auto; display: flex; gap: 8px; justify-content: flex-end;
+  padding: 14px 18px; border-top: 1px solid var(--line); background: var(--bg-soft);
+}
+
+/* 미리보기 안의 규정 하나하나 */
+.미리보기-자료 { margin-bottom: 22px; }
+.미리보기-자료:last-child { margin-bottom: 0; }
+.미리보기-자료-이름 {
+  margin: 0 0 8px; font-size: 14px; font-weight: 800; color: var(--brand-dark);
+  padding-bottom: 6px; border-bottom: 1.5px solid var(--brand-light);
+}
+.미리보기-자료-글 {
+  margin: 0; white-space: pre-wrap; word-break: break-word;
+  font-size: 13px; line-height: 1.75; color: var(--text);
+}
+
+/* =========================================================================
    4-1. 화면 3 — 규정 자료
    ========================================================================= */
 

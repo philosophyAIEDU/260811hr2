@@ -179,6 +179,7 @@
       <div class="버튼줄" style="margin-bottom:22px;">
         <button type="button" class="버튼 보조" id="마법사시작버튼">✏️ 문서가 없어요 (마법사 시작)</button>
         <button type="button" class="버튼 보조" id="샘플불러오기버튼">🎁 샘플로 체험해보기</button>
+        <button type="button" class="버튼 보조" id="샘플미리보기버튼">📄 샘플 내용 미리보기</button>
         <button type="button" class="버튼 보조" id="규정집내보내기버튼">⬇ 규정집 내보내기</button>
         <button type="button" class="버튼 보조" id="규정집불러오기버튼">⬆ 규정집 불러오기</button>
         <input type="file" id="규정집불러오기입력" class="숨김" accept=".json">
@@ -274,6 +275,21 @@
 
   <!-- ===== 맨 아래 고정 안내 ===== -->
   <footer class="바닥" id="바닥안내"></footer>
+
+  <!-- ===== 샘플 규정 미리보기 창 ===== -->
+  <div class="모달-배경 숨김" id="샘플미리보기-배경">
+    <div class="모달" role="dialog" aria-modal="true" aria-labelledby="샘플미리보기-제목">
+      <div class="모달-머리">
+        <h3 id="샘플미리보기-제목">샘플 규정 미리보기 · 가나다주식회사 (10건)</h3>
+        <button type="button" class="모달-닫기" id="샘플미리보기-닫기1" aria-label="닫기">✕</button>
+      </div>
+      <div class="모달-본문" id="샘플미리보기-본문"></div>
+      <div class="모달-바닥줄">
+        <button type="button" class="버튼 주" id="샘플미리보기-등록버튼">이 내용 그대로 등록하기</button>
+        <button type="button" class="버튼 보조" id="샘플미리보기-닫기2">닫기</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 빌드 도구를 쓰지 않으므로 script 태그로 순서대로 불러옵니다. -->
   <script src="js/config.js"></script>

@@ -66,6 +66,20 @@ var Docs = (function () {
     });
 
     요소('샘플불러오기버튼').addEventListener('click', 샘플불러오기);
+
+    요소('샘플미리보기버튼').addEventListener('click', 미리보기열기);
+    요소('샘플미리보기-닫기1').addEventListener('click', 미리보기닫기);
+    요소('샘플미리보기-닫기2').addEventListener('click', 미리보기닫기);
+    요소('샘플미리보기-배경').addEventListener('click', function (e) {
+      if (e.target === e.currentTarget) 미리보기닫기();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !요소('샘플미리보기-배경').classList.contains('숨김')) 미리보기닫기();
+    });
+    요소('샘플미리보기-등록버튼').addEventListener('click', function () {
+      미리보기닫기();
+      샘플불러오기();
+    });
     요소('규정집내보내기버튼').addEventListener('click', 규정집내보내기);
 
     요소('규정집불러오기버튼').addEventListener('click', function () {
@@ -213,6 +227,35 @@ var Docs = (function () {
       자료목록그리기();
       UI.쪽지('"' + name + '" 자료를 삭제했습니다.');
     });
+  }
+
+  /* =====================================================================
+     2-1. 샘플 내용 미리보기
+     -------------------------------------------------------------------
+     ★ sample/샘플규정.md 파일을 새 탭에서 직접 열지 않는다.
+       서버·file:// 환경에 따라 글자 인코딩이 깨지거나(euc-kr로 잘못 인식),
+       file:// 로 연 경우 fetch 자체가 막히기 때문이다.
+       이미 브라우저 안에 올바르게 들어와 있는 SAMPLE_DATA(js/sample-data.js)를
+       그대로 화면에 그려서 보여준다. (index.html의 UTF-8 설정을 그대로 따르므로
+       어떤 환경에서도 글자가 깨지지 않는다)
+     ===================================================================== */
+  function 미리보기열기() {
+    요소('샘플미리보기-본문').innerHTML = SAMPLE_DATA.map(function (자료) {
+      return (
+        '<div class="미리보기-자료">' +
+          '<p class="미리보기-자료-이름">📄 ' + UI.안전한글자(자료.자료명) + '</p>' +
+          '<p class="미리보기-자료-글">' + UI.안전한글자(자료.원문텍스트) + '</p>' +
+        '</div>'
+      );
+    }).join('');
+
+    요소('샘플미리보기-배경').classList.remove('숨김');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function 미리보기닫기() {
+    요소('샘플미리보기-배경').classList.add('숨김');
+    document.body.style.overflow = '';
   }
 
   /* =====================================================================
