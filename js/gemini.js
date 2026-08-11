@@ -96,33 +96,45 @@ var Gemini = (function () {
     var 버퍼 = '';
     var 중단이유 = null;
 
+    /* SSE 이벤트 한 조각("data: {...}")을 해석한다. */
+    function 조각처리(조각) {
+      var 줄 = 조각.trim();
+      if (줄.indexOf('data:') !== 0) return;
+
+      var json글자 = 줄.slice(5).trim();
+      if (!json글자 || json글자 === '[DONE]') return;
+
+      try {
+        var 파싱됨 = JSON.parse(json글자);
+        글자꺼내기(파싱됨).forEach(onChunk);
+        var 이번이유 = 중단이유찾기(파싱됨);
+        if (이번이유) 중단이유 = 이번이유;
+      } catch (e) {
+        // 아직 덜 온 JSON 조각은 건너뛴다 (다음 덩이에서 이어붙어 다시 해석됨)
+      }
+    }
+
     function 한덩이씩() {
       return reader.read().then(function (결과) {
-        if (결과.done) return 중단이유;
+        if (결과.done) {
+          // ★ 스트림이 끝났을 때, 버퍼에 남아 있는 마지막 이벤트를 반드시 처리한다.
+          //   (서버가 마지막 이벤트 뒤에 빈 줄을 안 붙이는 경우가 있는데,
+          //    이때 이 처리를 빠뜨리면 답변의 마지막 부분이나 답변 전체가 통째로 사라진다)
+          버퍼 += decoder.decode();
+          if (버퍼.trim()) 조각처리(버퍼);
+          버퍼 = '';
+          return 중단이유;
+        }
 
         활동있음();
-        버퍼 += decoder.decode(결과.value, { stream: true });
+        // 서버에 따라 줄바꿈이 \r\n 으로 올 수 있어 \n 으로 통일해 둔다.
+        버퍼 += decoder.decode(결과.value, { stream: true }).replace(/\r\n/g, '\n');
 
         // SSE 이벤트는 빈 줄(\n\n)로 구분된다. 마지막 미완성 조각은 버퍼에 남겨 둔다.
         var 조각들 = 버퍼.split('\n\n');
         버퍼 = 조각들.pop();
 
-        조각들.forEach(function (조각) {
-          var 줄 = 조각.trim();
-          if (줄.indexOf('data:') !== 0) return;
-
-          var json글자 = 줄.slice(5).trim();
-          if (!json글자) return;
-
-          try {
-            var 파싱됨 = JSON.parse(json글자);
-            글자꺼내기(파싱됨).forEach(onChunk);
-            var 이번이유 = 중단이유찾기(파싱됨);
-            if (이번이유) 중단이유 = 이번이유;
-          } catch (e) {
-            // 중간에 잘린 JSON 조각은 조용히 건너뛴다 (다음 덩이에서 이어짐)
-          }
-        });
+        조각들.forEach(조각처리);
 
         return 한덩이씩();
       });
