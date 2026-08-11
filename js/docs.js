@@ -56,6 +56,7 @@ var Docs = (function () {
     });
 
     요소('마법사시작버튼').addEventListener('click', function () {
+      if (window.Wizard) Wizard.리셋();
       UI.화면보이기('마법사');
     });
 

@@ -201,8 +201,54 @@
          화면 4 : 규정 만들기 마법사  — ④단계에서 제작
          ------------------------------------------------------------------ -->
     <section class="화면 숨김" id="화면-마법사">
-      <h2 class="화면제목">규정 만들기</h2>
-      <div class="공사중">이 화면은 다음 단계에서 만듭니다. (④ 규정 마법사)</div>
+      <h2 class="화면제목">규정 만들기 마법사</h2>
+      <p class="화면설명">문서가 없어도 괜찮습니다. 몇 가지 질문에 답하면 AI가 규정 문장으로 정리해 드립니다.</p>
+
+      <!-- 단계 0 : 주제 선택 -->
+      <div class="카드 마법사카드" id="마법사-주제선택">
+        <p class="마법사-안내글">정리하고 싶은 주제를 골라주세요. 여러 개를 한 번에 진행할 수 있고, 나중에 다시 시작해 나머지를 채워도 됩니다.</p>
+        <div class="마법사-주제목록" id="마법사-주제목록"></div>
+        <div class="버튼줄" style="margin-top:22px;">
+          <button type="button" class="버튼 주" id="마법사-시작버튼" disabled>선택한 주제로 시작하기</button>
+          <button type="button" class="버튼 보조" id="마법사-취소버튼1">규정 자료로 돌아가기</button>
+        </div>
+      </div>
+
+      <!-- 단계 1 : 질문 진행 -->
+      <div class="카드 마법사카드 숨김" id="마법사-진행">
+        <div class="마법사-진행머리">
+          <div class="마법사-진행바-겉"><div class="마법사-진행바-속" id="마법사-진행바"></div></div>
+          <button type="button" class="마법사-그만두기" id="마법사-취소버튼3">그만두기</button>
+        </div>
+        <p class="마법사-진행표시" id="마법사-진행표시"></p>
+        <p class="마법사-주제라벨" id="마법사-주제라벨"></p>
+        <h3 class="마법사-질문글" id="마법사-질문글"></h3>
+
+        <div id="마법사-답변영역"></div>
+
+        <div class="버튼줄" style="margin-top:24px;">
+          <button type="button" class="버튼 보조" id="마법사-이전버튼">← 이전</button>
+          <button type="button" class="버튼 보조" id="마법사-건너뛰기버튼">건너뛰기</button>
+          <button type="button" class="버튼 주" id="마법사-다음버튼">다음 →</button>
+        </div>
+      </div>
+
+      <!-- 단계 2 : AI 정리 결과 확인·수정·저장 -->
+      <div class="카드 마법사카드 숨김" id="마법사-결과">
+        <p class="소제목"><span class="번호">✓</span> <span id="마법사-결과제목">AI가 답변을 정리하고 있습니다…</span></p>
+
+        <label class="읽기전용" for="마법사-자료명입력">자료명</label>
+        <input class="입력칸" id="마법사-자료명입력" style="margin-bottom:14px;">
+
+        <label class="읽기전용" for="마법사-결과글">정리된 규정 (직접 고칠 수 있습니다)</label>
+        <textarea class="입력칸 마법사-결과글" id="마법사-결과글" rows="16" disabled></textarea>
+
+        <div class="버튼줄" style="margin-top:16px;">
+          <button type="button" class="버튼 주" id="마법사-저장버튼" disabled>저장</button>
+          <button type="button" class="버튼 보조" id="마법사-다시만들기버튼" disabled>다시 정리하기</button>
+          <button type="button" class="버튼 보조" id="마법사-취소버튼2">취소</button>
+        </div>
+      </div>
     </section>
 
     <!-- ------------------------------------------------------------------
@@ -224,11 +270,13 @@
   <script src="js/chunker.js"></script>
   <script src="js/db.js"></script>
   <script src="js/sample-data.js"></script>
+  <script src="js/wizard-data.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/file-extract.js"></script>
   <script src="js/docs.js"></script>
   <script src="js/gemini.js"></script>
   <script src="js/chat.js"></script>
+  <script src="js/wizard.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

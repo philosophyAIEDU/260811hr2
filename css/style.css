@@ -508,6 +508,73 @@ a { color: var(--brand); }
 .채팅입력줄 .버튼 { flex: 0 0 auto; height: 44px; }
 
 /* =========================================================================
+   4-3. 화면 4 — 규정 만들기 마법사
+   ========================================================================= */
+
+.마법사카드 { padding: 24px; max-width: 720px; margin: 0 auto; }
+.마법사-안내글 { margin: 0 0 18px; color: var(--text-sub); font-size: 14px; line-height: 1.7; }
+
+/* ---- 단계 0 : 주제 카드 ---- */
+.마법사-주제목록 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.마법사-주제카드 {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 15px;
+  border: 1.5px solid var(--line); border-radius: var(--radius-lg);
+  background: #fff; cursor: pointer; text-align: left;
+  transition: border-color .15s, background .15s;
+}
+.마법사-주제카드:hover { border-color: #C9B8F5; }
+.마법사-주제카드.선택됨 { border-color: var(--brand); background: var(--brand-light); }
+
+.마법사-주제카드-체크 {
+  flex: 0 0 auto; width: 20px; height: 20px; border-radius: 6px;
+  border: 1.5px solid #C4C7CF; background: #fff;
+  position: relative;
+}
+.마법사-주제카드.선택됨 .마법사-주제카드-체크 { background: var(--brand); border-color: var(--brand); }
+.마법사-주제카드.선택됨 .마법사-주제카드-체크::after {
+  content: ''; position: absolute; left: 6px; top: 2px;
+  width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.마법사-주제카드-글 { display: flex; flex-direction: column; gap: 2px; }
+.마법사-주제카드-이름 { font-weight: 700; font-size: 14.5px; color: var(--text); }
+.마법사-주제카드-설명 { font-size: 12px; color: var(--text-sub); }
+
+/* ---- 단계 1 : 질문 진행 ---- */
+.마법사-진행머리 { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.마법사-진행바-겉 { flex: 1 1 auto; height: 6px; border-radius: 999px; background: var(--bg-soft); overflow: hidden; }
+.마법사-진행바-속 { height: 100%; background: linear-gradient(90deg, var(--brand), var(--accent)); transition: width .25s ease; }
+.마법사-그만두기 {
+  flex: 0 0 auto; border: 0; background: none; cursor: pointer;
+  font-size: 12.5px; color: var(--text-sub); font-weight: 600; padding: 2px 4px;
+}
+.마법사-그만두기:hover { color: var(--danger); }
+
+.마법사-진행표시 { margin: 0 0 4px; font-size: 12.5px; font-weight: 700; color: var(--brand); }
+.마법사-주제라벨 { margin: 0 0 10px; font-size: 12.5px; color: var(--text-sub); }
+.마법사-질문글 { margin: 0 0 18px; font-size: 18px; font-weight: 700; line-height: 1.5; }
+
+.마법사-예아니오 { display: flex; gap: 10px; margin-bottom: 12px; }
+.마법사-예아니오버튼 {
+  flex: 1 1 0; padding: 13px; border-radius: var(--radius);
+  border: 1.5px solid var(--line); background: #fff;
+  font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer;
+}
+.마법사-예아니오버튼:hover { border-color: #C9B8F5; }
+.마법사-예아니오버튼.선택됨 { border-color: var(--brand); background: var(--brand); color: #fff; }
+
+.마법사-직접입력줄 { resize: vertical; }
+
+/* ---- 단계 2 : 결과 확인 ---- */
+.마법사-결과글 {
+  width: 100%; resize: vertical;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 13.5px; line-height: 1.7; white-space: pre-wrap;
+}
+.마법사-결과글:disabled { background: var(--bg-soft); color: var(--text-sub); }
+
+/* =========================================================================
    5. 휴대폰 화면
    ========================================================================= */
 @media (max-width: 640px) {
@@ -542,4 +609,8 @@ a { color: var(--brand); }
   .말풍선 { max-width: 96%; }
   .채팅입력바 { padding: 8px 10px; }
   #화면-채팅 { padding-bottom: 108px; }
+
+  .마법사카드 { padding: 18px; }
+  .마법사-주제목록 { grid-template-columns: 1fr; }
+  .마법사-질문글 { font-size: 16.5px; }
 }

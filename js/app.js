@@ -22,6 +22,7 @@
     연결하기();
     Docs.초기화();
     Chat.초기화();
+    Wizard.초기화();
 
     DB.open().then(function (아이디비성공) {
       if (!아이디비성공) {
