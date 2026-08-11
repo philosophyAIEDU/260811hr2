@@ -575,6 +575,22 @@ a { color: var(--brand); }
 .마법사-결과글:disabled { background: var(--bg-soft); color: var(--text-sub); }
 
 /* =========================================================================
+   4-4. 화면 5 — 미답변 질문
+   ========================================================================= */
+
+.미답변-항목 {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.미답변-항목:last-child { border-bottom: 0; }
+
+.미답변-가운데 { flex: 1 1 auto; min-width: 0; }
+.미답변-질문 { font-weight: 700; font-size: 14.5px; line-height: 1.5; word-break: break-word; }
+.미답변-일시 { margin-top: 3px; color: var(--text-sub); font-size: 12.5px; }
+.미답변-삭제 { flex: 0 0 auto; }
+
+/* =========================================================================
    5. 휴대폰 화면
    ========================================================================= */
 @media (max-width: 640px) {
@@ -613,4 +629,7 @@ a { color: var(--brand); }
   .마법사카드 { padding: 18px; }
   .마법사-주제목록 { grid-template-columns: 1fr; }
   .마법사-질문글 { font-size: 16.5px; }
+
+  .미답변-항목 { flex-wrap: wrap; }
+  .미답변-삭제 { margin-left: auto; }
 }

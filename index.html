@@ -256,8 +256,18 @@
          ------------------------------------------------------------------ -->
     <section class="화면 숨김" id="화면-미답변">
       <h2 class="화면제목">미답변 질문</h2>
-      <p class="화면설명">규정에서 답을 찾지 못한 질문이 자동으로 쌓입니다.</p>
-      <div class="공사중">이 화면은 다음 단계에서 만듭니다. (⑤ 미답변 목록)</div>
+      <p class="화면설명">규정에서 답을 찾지 못해 안내 문구로 답한 질문이 여기에 자동으로 쌓입니다. HR 담당자는 이 목록을 보고 규정 자료를 보완할 수 있습니다.</p>
+
+      <div class="버튼줄" style="margin-bottom:18px;">
+        <button type="button" class="버튼 보조" id="미답변다운로드버튼">⬇ txt로 내려받기</button>
+      </div>
+
+      <div class="카드">
+        <div id="미답변목록"></div>
+        <p class="자료목록-빈칸 숨김" id="미답변-빈칸">
+          아직 답하지 못한 질문이 없습니다.<br>규정에 없는 질문을 받으면 이곳에 자동으로 쌓입니다.
+        </p>
+      </div>
     </section>
 
   </main>
@@ -277,6 +287,7 @@
   <script src="js/gemini.js"></script>
   <script src="js/chat.js"></script>
   <script src="js/wizard.js"></script>
+  <script src="js/unanswered.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

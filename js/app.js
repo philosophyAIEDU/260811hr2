@@ -23,6 +23,7 @@
     Docs.초기화();
     Chat.초기화();
     Wizard.초기화();
+    Unanswered.초기화();
 
     DB.open().then(function (아이디비성공) {
       if (!아이디비성공) {
@@ -58,6 +59,7 @@
       UI.화면보이기(탭.dataset.화면);
       if (탭.dataset.화면 === '자료') Docs.자료목록그리기();
       if (탭.dataset.화면 === '채팅') Chat.화면진입시();
+      if (탭.dataset.화면 === '미답변') Unanswered.목록그리기();
     });
 
     // 맨 위 [키 설정] 버튼
