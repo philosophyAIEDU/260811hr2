@@ -12,7 +12,9 @@ var Gemini = (function () {
 
   /* -----------------------------------------------------------------------
      요청 하나 보내기 (스트리밍)
-     옵션 : { apiKey, systemPrompt, question, onChunk(글자), onDone(), onError(한글오류) }
+     옵션 : { apiKey, systemPrompt, question, onChunk(글자), onDone(중단이유), onError(한글오류) }
+     ※ 중단이유 : 정상 종료면 null. 구글의 안전 정책 등으로 글자 없이 끝났다면
+       'SAFETY' | 'RECITATION' | 'BLOCKED' | '기타' 중 하나가 전달된다.
      ----------------------------------------------------------------------- */
   function 질문하기(옵션) {
     var 본문 = {
@@ -44,8 +46,8 @@ var Gemini = (function () {
         }
         return 스트림읽기(response, 옵션.onChunk);
       })
-      .then(function () {
-        옵션.onDone();
+      .then(function (중단이유) {
+        옵션.onDone(중단이유);
       })
       .catch(function (오류) {
         옵션.onError(한글오류문구(오류));
@@ -56,15 +58,17 @@ var Gemini = (function () {
 
   /* -----------------------------------------------------------------------
      SSE(Server-Sent Events) 형식의 스트림 응답을 한 줄씩 읽는다.
+     반환값(Promise) : 정상 종료면 null, 안전 정책 등으로 막혔다면 그 사유 문자열.
      ----------------------------------------------------------------------- */
   function 스트림읽기(response, onChunk) {
     var reader = response.body.getReader();
     var decoder = new TextDecoder('utf-8');
     var 버퍼 = '';
+    var 중단이유 = null;
 
     function 한덩이씩() {
       return reader.read().then(function (결과) {
-        if (결과.done) return;
+        if (결과.done) return 중단이유;
 
         버퍼 += decoder.decode(결과.value, { stream: true });
 
@@ -82,6 +86,8 @@ var Gemini = (function () {
           try {
             var 파싱됨 = JSON.parse(json글자);
             글자꺼내기(파싱됨).forEach(onChunk);
+            var 이번이유 = 중단이유찾기(파싱됨);
+            if (이번이유) 중단이유 = 이번이유;
           } catch (e) {
             // 중간에 잘린 JSON 조각은 조용히 건너뛴다 (다음 덩이에서 이어짐)
           }
@@ -103,6 +109,17 @@ var Gemini = (function () {
       if (typeof part.text === 'string') 결과.push(part.text);
     });
     return 결과;
+  }
+
+  /* 글자가 하나도 안 왔을 때, 왜 막혔는지 짐작할 단서를 찾는다. */
+  function 중단이유찾기(응답조각) {
+    if (응답조각 && 응답조각.promptFeedback && 응답조각.promptFeedback.blockReason) return 'BLOCKED';
+
+    var 후보 = 응답조각 && 응답조각.candidates && 응답조각.candidates[0];
+    if (!후보 || !후보.finishReason) return null;
+    if (후보.finishReason === 'STOP' || 후보.finishReason === 'MAX_TOKENS') return null;
+    if (후보.finishReason === 'SAFETY' || 후보.finishReason === 'RECITATION') return 후보.finishReason;
+    return '기타';
   }
 
   /* -----------------------------------------------------------------------
