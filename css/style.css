@@ -1,45 +1,48 @@
 /* =========================================================================
-   디자인 기준값 (style.css)
+   사내 규정 FAQ 챗봇 — 화면 모양 (style.css)
    -------------------------------------------------------------------------
-   1단계에서는 색·글꼴·여백 같은 "기준값"만 정해 둡니다.
-   실제 화면 모양은 2단계부터 이 기준값을 가져다 씁니다.
+   1) 기준값(색·크기)  2) 공통 부품(버튼·입력칸·카드)
+   3) 앱 뼈대(상단띠·머리말·탭·바닥안내)  4) 화면별 모양
    ========================================================================= */
 
+/* =========================================================================
+   1. 기준값
+   ========================================================================= */
 :root {
   /* ---- 색 ---- */
   --brand:         #6C2BD9;   /* 기본 보라 (버튼, 강조) */
   --brand-dark:    #4C1D95;   /* 진한 보라 (눌렀을 때) */
   --brand-light:   #F3EEFF;   /* 아주 연한 보라 (선택된 배경) */
   --accent:        #E5177B;   /* 분홍 (현재 위치 표시) */
-  --navy:          #1B1735;   /* 짙은 남보라 (상단 띠, 왼쪽 메뉴) */
+  --navy:          #1B1735;   /* 짙은 남보라 (상단 띠) */
 
   --text:          #1A1A1A;   /* 본문 글자 */
   --text-sub:      #6B7280;   /* 흐린 글자 */
   --line:          #E5E7EB;   /* 선 */
   --bg:            #FFFFFF;   /* 바탕 */
-  --bg-soft:       #F7F7FA;   /* 옅은 바탕 */
+  --bg-soft:       #F5F5F8;   /* 옅은 바탕 */
 
   --ok:            #067647;   /* 성공 */
   --warn:          #B54708;   /* 주의 */
+  --warn-bg:       #FFFAEB;
   --danger:        #B42318;   /* 위험·삭제 */
+  --danger-bg:     #FEF3F2;
 
   /* ---- 크기 ---- */
   --radius:        10px;
   --radius-lg:     16px;
   --gap:           16px;
-  --max-width:     1080px;
+  --max-width:     1000px;
+  --바닥높이:      40px;
 
   --shadow:        0 1px 3px rgba(16, 24, 40, .08), 0 1px 2px rgba(16, 24, 40, .06);
-  --shadow-lg:     0 8px 24px rgba(16, 24, 40, .12);
+  --shadow-lg:     0 10px 30px rgba(27, 23, 53, .13);
 }
 
 /* ---- 기본값 정리 ---- */
 * { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
-  padding: 0;
-}
+html, body { margin: 0; padding: 0; }
 
 body {
   font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "맑은 고딕",
@@ -48,10 +51,307 @@ body {
   line-height: 1.65;
   color: var(--text);
   background: var(--bg-soft);
-  -webkit-text-size-adjust: 100%;   /* 휴대폰에서 글자가 제멋대로 커지지 않게 */
+  -webkit-text-size-adjust: 100%;      /* 휴대폰에서 글자가 제멋대로 커지지 않게 */
+  padding-bottom: var(--바닥높이);      /* 하단 고정 안내에 가리지 않도록 */
 }
 
-button, input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
+button, input, textarea, select { font-family: inherit; font-size: inherit; }
+
+a { color: var(--brand); }
+
+.숨김 { display: none !important; }
+
+/* 눈에는 안 보이지만 화면 낭독기에는 읽히는 글 */
+.읽기전용 {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* =========================================================================
+   2. 공통 부품
+   ========================================================================= */
+
+/* ---- 버튼 ---- */
+.버튼 {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.버튼:disabled { opacity: .45; cursor: not-allowed; }
+
+.버튼.주      { background: var(--brand); color: #fff; }
+.버튼.주:hover:not(:disabled)   { background: var(--brand-dark); }
+
+.버튼.보조    { background: #fff; color: var(--text); border-color: var(--line); }
+.버튼.보조:hover:not(:disabled) { background: var(--bg-soft); border-color: #D0D5DD; }
+
+.버튼.위험    { background: #fff; color: var(--danger); border-color: #FDA29B; }
+.버튼.위험:hover:not(:disabled) { background: var(--danger-bg); }
+
+.버튼.작게    { padding: 7px 12px; font-size: 13px; }
+.버튼.꽉      { width: 100%; }
+
+/* ---- 입력칸 ---- */
+.입력칸 {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--text);
+  outline: none;
+}
+.입력칸:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(108, 43, 217, .12); }
+.입력칸.오류 { border-color: #FDA29B; }
+
+/* ---- 카드 ---- */
+.카드 {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ---- 알림 상자 ---- */
+.알림 { padding: 12px 14px; border-radius: var(--radius); font-size: 14px; border: 1px solid; }
+.알림.주의 { background: var(--warn-bg);   border-color: #FEDF89; color: var(--warn); }
+.알림.성공 { background: #ECFDF3;          border-color: #A6F4C5; color: var(--ok); }
+.알림.오류 { background: var(--danger-bg); border-color: #FDA29B; color: var(--danger); }
+
+/* ---- 잠깐 떴다 사라지는 알림 ---- */
+.쪽지 {
+  position: fixed; left: 50%; bottom: calc(var(--바닥높이) + 16px);
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 11px 18px;
+  border-radius: 999px;
+  background: var(--navy); color: #fff;
+  font-size: 14px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 90;
+  animation: 쪽지등장 .18s ease-out;
+}
+.쪽지.오류 { background: var(--danger); }
+@keyframes 쪽지등장 { from { opacity: 0; transform: translate(-50%, 8px); } }
+
+/* =========================================================================
+   3. 앱 뼈대
+   ========================================================================= */
+
+/* ---- 맨 위 짙은 띠 ---- */
+.상단띠 { background: var(--navy); color: #fff; }
+.상단띠-속 {
+  max-width: var(--max-width); margin: 0 auto;
+  padding: 0 16px; height: 38px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px;
+}
+.상단띠-속 .회사명 { color: rgba(255,255,255,.75); }
+.상단띠-속 .회사명 b { color: #fff; font-weight: 600; }
+.상단띠-속 .회사명 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.띠버튼 {
+  flex: 0 0 auto;
+  background: transparent; border: 1px solid rgba(255,255,255,.28);
+  color: #fff; padding: 4px 11px; border-radius: 999px;
+  font-size: 12.5px; white-space: nowrap; cursor: pointer;
+}
+.띠버튼:hover { background: rgba(255,255,255,.12); }
+
+/* ---- 흰 머리말 (로고 + 탭) ---- */
+.머리말 { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+.머리말-속 {
+  max-width: var(--max-width); margin: 0 auto; padding: 0 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 62px;
+}
+.로고 { display: flex; align-items: center; gap: 10px; }
+.로고-표 {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: linear-gradient(135deg, var(--brand) 0%, var(--accent) 100%);
+  color: #fff; font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: -.5px;
+}
+.로고-글 { font-size: 17px; font-weight: 800; letter-spacing: -.4px; }
+.로고-글 span { color: var(--brand); }
+
+/* ---- 탭 3개 ---- */
+.탭들 { display: flex; gap: 2px; }
+.탭 {
+  position: relative;
+  background: none; border: 0; cursor: pointer;
+  padding: 20px 14px; font-size: 15px; font-weight: 600; color: var(--text-sub);
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+}
+.탭:hover:not(:disabled) { color: var(--text); }
+.탭.현재 { color: var(--brand); border-bottom-color: var(--accent); }
+.탭:disabled { color: #C4C7CF; cursor: not-allowed; }
+.탭 .자물쇠 { font-size: 11px; }
+
+/* ---- 본문 ---- */
+.본문 { max-width: var(--max-width); margin: 0 auto; padding: 24px 16px 40px; }
+.화면 { animation: 화면등장 .18s ease-out; }
+@keyframes 화면등장 { from { opacity: 0; transform: translateY(4px); } }
+
+.화면제목 { font-size: 20px; font-weight: 800; margin: 0 0 4px; letter-spacing: -.4px; }
+.화면설명 { color: var(--text-sub); font-size: 14px; margin: 0 0 20px; }
+
+/* ---- 맨 아래 고정 안내 ---- */
+.바닥 {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  height: var(--바닥높이);
+  background: rgba(27, 23, 53, .95);
+  color: rgba(255,255,255,.82);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12.5px; text-align: center; padding: 0 12px;
+  line-height: 1.35;
+}
+
+/* =========================================================================
+   4. 화면 1 — 처음 설정 (API 키)
+   ========================================================================= */
+
+.설정카드 { max-width: 680px; margin: 0 auto; }
+
+/* 위쪽 그라데이션 머리 */
+.설정머리 {
+  padding: 30px 28px;
+  background:
+    radial-gradient(120% 140% at 88% 0%, rgba(229, 23, 123, .55) 0%, rgba(229, 23, 123, 0) 55%),
+    linear-gradient(135deg, #1B1735 0%, #3B1D77 58%, #6C2BD9 100%);
+  color: #fff;
+}
+.설정머리 .작은글 {
+  display: inline-block; margin: 0 0 10px;
+  padding: 3px 11px; border-radius: 999px;
+  background: rgba(255,255,255,.16);
+  font-size: 12.5px; font-weight: 600;
+}
+.설정머리 h1 { margin: 0 0 8px; font-size: 23px; line-height: 1.4; font-weight: 800; letter-spacing: -.6px; }
+.설정머리 p  { margin: 0; font-size: 14px; color: rgba(255,255,255,.8); }
+
+.설정몸통 { padding: 26px 28px 28px; }
+
+.소제목 {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15.5px; font-weight: 700; margin: 0 0 12px;
+}
+.소제목 .번호 {
+  width: 22px; height: 22px; border-radius: 6px; flex: 0 0 auto;
+  background: var(--brand-light); color: var(--brand);
+  font-size: 12.5px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.구분선 { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+
+/* 5단계 안내 */
+.단계목록 { list-style: none; margin: 0; padding: 0; counter-reset: 단계; }
+.단계목록 li {
+  counter-increment: 단계;
+  position: relative;
+  padding: 0 0 14px 38px;
+  font-size: 14.5px;
+}
+.단계목록 li::before {
+  content: counter(단계);
+  position: absolute; left: 0; top: 1px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--brand); color: #fff;
+  font-size: 12.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+/* 단계와 단계를 잇는 세로선 */
+.단계목록 li:not(:last-child)::after {
+  content: ''; position: absolute; left: 11.5px; top: 28px; bottom: 4px;
+  width: 1px; background: var(--line);
+}
+.단계목록 .덧말 { display: block; color: var(--text-sub); font-size: 13px; margin-top: 2px; }
+
+.키링크 {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 6px; padding: 9px 14px;
+  background: var(--brand-light); color: var(--brand);
+  border-radius: var(--radius); font-size: 14px; font-weight: 700;
+  text-decoration: none; word-break: break-all;
+}
+.키링크:hover { background: #E9E0FF; }
+
+/* 키 입력줄 */
+.입력줄 { position: relative; }
+.입력줄 .입력칸 { padding-right: 48px; letter-spacing: .5px; }
+.눈버튼 {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  width: 36px; height: 36px; border: 0; border-radius: 8px;
+  background: transparent; color: var(--text-sub);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.눈버튼:hover { background: var(--bg-soft); color: var(--text); }
+.눈버튼 svg { width: 19px; height: 19px; }
+
+.도움말 { font-size: 13px; color: var(--text-sub); margin: 8px 0 0; }
+.도움말.오류 { color: var(--danger); }
+.도움말.성공 { color: var(--ok); }
+
+.버튼줄 { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+
+/* 저장된 키 상태 표시 */
+.키상태 {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 15px; border-radius: var(--radius);
+  background: #ECFDF3; border: 1px solid #A6F4C5;
+  font-size: 14px; color: var(--ok); font-weight: 600;
+  margin-bottom: 16px;
+}
+.키상태 .가린키 {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color: var(--text-sub); font-weight: 500; letter-spacing: 1px;
+}
+
+.안심문구 {
+  margin-top: 22px; padding: 13px 15px;
+  background: var(--bg-soft); border-radius: var(--radius);
+  font-size: 13px; color: var(--text-sub); line-height: 1.6;
+}
+
+/* 아직 만들지 않은 화면 자리 */
+.공사중 {
+  padding: 60px 20px; text-align: center;
+  color: var(--text-sub); font-size: 14.5px;
+  background: #fff; border: 1px dashed var(--line); border-radius: var(--radius-lg);
+}
+
+/* =========================================================================
+   5. 휴대폰 화면
+   ========================================================================= */
+@media (max-width: 640px) {
+  body { font-size: 14.5px; }
+
+  .상단띠-속 { padding: 0 12px; height: 36px; }
+  .띠설명 { display: none; }   /* 좁은 화면에서는 설명을 숨겨 줄바꿈을 막는다 */
+
+  .머리말-속 { min-height: 56px; padding: 0 12px; flex-wrap: wrap; gap: 0; }
+  .로고-글 { font-size: 15.5px; }
+  .로고-표 { width: 30px; height: 30px; font-size: 13px; }
+
+  /* 탭은 줄바꿈해서 가로 전체를 3등분 */
+  .탭들 { width: 100%; order: 3; border-top: 1px solid var(--line); }
+  .탭 { flex: 1 1 0; padding: 13px 4px; font-size: 13.5px; text-align: center; }
+
+  .본문 { padding: 16px 12px 32px; }
+
+  .설정머리 { padding: 24px 18px; }
+  .설정머리 h1 { font-size: 19.5px; }
+  .설정몸통 { padding: 20px 18px 22px; }
+
+  .버튼줄 .버튼 { flex: 1 1 100%; }
+  .바닥 { font-size: 11.5px; }
 }
