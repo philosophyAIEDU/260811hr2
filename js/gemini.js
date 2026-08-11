@@ -10,6 +10,10 @@
 
 var Gemini = (function () {
 
+  // 이만큼 아무 반응(연결·글자 어느 쪽도)이 없으면, 서버가 응답을 안 주는 것으로 보고
+  // 스스로 요청을 중단한다. (안 그러면 화면이 "묵묵부답" 상태로 영원히 멈출 수 있다)
+  var 무응답한도_밀리초 = 30000;
+
   /* -----------------------------------------------------------------------
      요청 하나 보내기 (스트리밍)
      옵션 : { apiKey, systemPrompt, question, onChunk(글자), onDone(중단이유), onError(한글오류) }
@@ -34,6 +38,18 @@ var Gemini = (function () {
 
     var 컨트롤러 = new AbortController();
 
+    // ---- 무응답 감시(워치독) : 연결도 글자도 한동안 전혀 없으면 스스로 중단한다 ----
+    var 타임아웃으로중단됨 = false;
+    var 마지막활동시각 = Date.now();
+    var 감시타이머 = setInterval(function () {
+      if (Date.now() - 마지막활동시각 > 무응답한도_밀리초) {
+        타임아웃으로중단됨 = true;
+        clearInterval(감시타이머);
+        컨트롤러.abort();
+      }
+    }, 1000);
+    function 활동있음() { 마지막활동시각 = Date.now(); }
+
     fetch(CONFIG.getStreamUrl(), {
       method: 'POST',
       headers: {
@@ -45,29 +61,36 @@ var Gemini = (function () {
       signal: 컨트롤러.signal
     })
       .then(function (response) {
+        활동있음();
         if (!response.ok) {
           return response.json().catch(function () { return null; })
             .then(function (오류바디) {
               throw 오류만들기(response.status, 오류바디);
             });
         }
-        return 스트림읽기(response, 옵션.onChunk);
+        return 스트림읽기(response, 옵션.onChunk, 활동있음);
       })
       .then(function (중단이유) {
+        clearInterval(감시타이머);
         옵션.onDone(중단이유);
       })
       .catch(function (오류) {
-        옵션.onError(한글오류문구(오류));
+        clearInterval(감시타이머);
+        옵션.onError(타임아웃으로중단됨 ? 무응답오류문구() : 한글오류문구(오류));
       });
 
     return 컨트롤러;
+  }
+
+  function 무응답오류문구() {
+    return '서버로부터 응답이 없어 요청을 중단했습니다. 인터넷 연결 상태를 확인하고 다시 시도해 주세요.';
   }
 
   /* -----------------------------------------------------------------------
      SSE(Server-Sent Events) 형식의 스트림 응답을 한 줄씩 읽는다.
      반환값(Promise) : 정상 종료면 null, 안전 정책 등으로 막혔다면 그 사유 문자열.
      ----------------------------------------------------------------------- */
-  function 스트림읽기(response, onChunk) {
+  function 스트림읽기(response, onChunk, 활동있음) {
     var reader = response.body.getReader();
     var decoder = new TextDecoder('utf-8');
     var 버퍼 = '';
@@ -77,6 +100,7 @@ var Gemini = (function () {
       return reader.read().then(function (결과) {
         if (결과.done) return 중단이유;
 
+        활동있음();
         버퍼 += decoder.decode(결과.value, { stream: true });
 
         // SSE 이벤트는 빈 줄(\n\n)로 구분된다. 마지막 미완성 조각은 버퍼에 남겨 둔다.
